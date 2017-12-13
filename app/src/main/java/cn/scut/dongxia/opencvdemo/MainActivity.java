@@ -4,18 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import org.opencv.android.InstallCallbackInterface;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
+import org.opencv.android.*;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "MainActivity";
@@ -25,7 +18,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Bitmap bitmap;
 
     static {
-        System.loadLibrary("opencv_java3");
+        System.loadLibrary("native-lib");
     }
 
     @Override
@@ -45,16 +38,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.lena);
         image.setImageBitmap(bitmap);
         button.setOnClickListener(this);
+
+
     }
 
     @Override
     public void onClick(View view) {
-        Mat mat = new Mat();
+        int w = bitmap.getWidth();
+        int h = bitmap.getHeight();
 
-        Utils.bitmapToMat(bitmap,mat);
-        Imgproc.cvtColor(mat,mat,Imgproc.COLOR_BGR2GRAY);
-        final Bitmap result = Bitmap.createBitmap(bitmap);
-        Utils.matToBitmap(mat,result);
-        image.setImageBitmap(bitmap);
+        int[] pixels = new int[w*h];
+        bitmap.getPixels(pixels,0,w,0,0,w,h);
+
+        int[] resultInt = color2gray(pixels,w,h);
+
+        Bitmap resultImg = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+
+        //(@ColorInt int[] pixels, int offset, int stride,int x, int y, int width, int height)
+        resultImg.setPixels(resultInt, 0, w, 0, 0, w, h);
+        image.setImageBitmap(resultImg);
     }
+
+    public native int[] color2gray(int[] pixels, int w, int h);
 }

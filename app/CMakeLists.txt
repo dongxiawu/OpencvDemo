@@ -10,7 +10,6 @@ set(LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/src/main/jniLibs")
 # 包含头文件目录
 include_directories(src/main/cpp/include)
 
-
 # 添加 opencv 的动态库
 add_library( # Sets the name of the library.
              libopencv_java3
